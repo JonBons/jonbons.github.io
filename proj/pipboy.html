@@ -526,8 +526,70 @@
     width:calc(var(--unit)*1.8); height:calc(var(--unit)*1.8); border-radius:3px; cursor:pointer;
   }
   .settings-close:active{ background:var(--phosphor); color:var(--bg-black); }
-  .settings-tabbar{ display:flex; gap:calc(var(--unit)*0.4); flex:0 0 auto; margin-bottom:calc(var(--unit)*0.5); flex-wrap:wrap; }
+  .settings-tabbar{ display:flex; gap:calc(var(--unit)*0.4); flex:0 0 auto; margin-bottom:calc(var(--unit)*0.4); flex-wrap:wrap; }
   .settings-tabbar .chip{ flex:1 1 auto; text-align:center; min-width:calc(var(--unit)*4); }
+  .settings-viewtoggle{ display:flex; gap:calc(var(--unit)*0.4); flex:0 0 auto; margin-bottom:calc(var(--unit)*0.5); }
+  .settings-viewtoggle .chip{ flex:0 0 auto; padding:calc(var(--unit)*0.12) calc(var(--unit)*0.8); font-size:calc(var(--unit)*1.02); }
+
+  .settings-body{ flex:1 1 auto; min-height:0; display:flex; overflow:hidden; }
+  .settings-form{ flex:1 1 auto; min-height:0; overflow-y:auto; padding-right:calc(var(--unit)*0.3); }
+  .settings-form::-webkit-scrollbar{ width:calc(var(--unit)*0.5); }
+  .settings-form::-webkit-scrollbar-thumb{ background:var(--phosphor-dim); border-radius:4px; }
+
+  .form-section-title{
+    font-family:var(--font-display); font-size:calc(var(--unit)*1.2); color:var(--phosphor-bright);
+    letter-spacing:.1em; border-bottom:1px dashed var(--phosphor-dimmer);
+    padding-bottom:calc(var(--unit)*0.2); margin:calc(var(--unit)*0.7) 0 calc(var(--unit)*0.45);
+  }
+  .form-section-title:first-child{ margin-top:0; }
+  .form-sub-title{
+    font-size:calc(var(--unit)*0.85); color:var(--phosphor-dim); letter-spacing:.08em;
+    margin:calc(var(--unit)*0.4) 0 calc(var(--unit)*0.25);
+  }
+  .form-row{
+    display:flex; align-items:center; gap:calc(var(--unit)*0.6);
+    margin-bottom:calc(var(--unit)*0.4);
+  }
+  .form-row label{
+    flex:0 0 auto; width:calc(var(--unit)*6.5); font-size:calc(var(--unit)*0.88);
+    color:var(--phosphor-dim);
+  }
+  .form-input, .form-textarea{
+    flex:1 1 auto; width:100%;
+    background:rgba(0,0,0,.35); color:var(--phosphor-bright);
+    border:1px solid var(--phosphor-dim); border-radius:3px;
+    font-family:var(--font-body); font-size:calc(var(--unit)*0.92);
+    padding:calc(var(--unit)*0.3) calc(var(--unit)*0.4);
+  }
+  .form-input:focus, .form-textarea:focus{ outline:none; border-color:var(--phosphor); }
+  .form-textarea{ resize:vertical; line-height:1.4; }
+  .form-checkbox{ width:calc(var(--unit)*1.2); height:calc(var(--unit)*1.2); accent-color:var(--phosphor); flex:0 0 auto; }
+  .form-inline-row{
+    display:flex; align-items:center; gap:calc(var(--unit)*0.4);
+    margin-bottom:calc(var(--unit)*0.35);
+  }
+  .form-inline-row .form-input.narrow{ flex:0 0 calc(var(--unit)*3); }
+  .form-card{
+    border:1px solid var(--phosphor-dimmer); border-radius:4px;
+    padding:calc(var(--unit)*0.6); margin-bottom:calc(var(--unit)*0.6);
+    background:rgba(79,232,99,.03);
+  }
+  .form-add, .form-remove{
+    font-family:var(--font-display); font-size:calc(var(--unit)*1.05);
+    border-radius:3px; cursor:pointer; letter-spacing:.05em;
+    padding:calc(var(--unit)*0.3) calc(var(--unit)*0.7);
+  }
+  .form-add{
+    background:transparent; border:1px dashed var(--phosphor-dim); color:var(--phosphor);
+    width:100%; margin-bottom:calc(var(--unit)*0.7);
+  }
+  .form-add:active{ background:rgba(79,232,99,.12); }
+  .form-remove{
+    background:transparent; border:1px solid var(--red-warn); color:var(--red-warn);
+    margin-top:calc(var(--unit)*0.3);
+  }
+  .form-remove:active{ background:var(--red-warn); color:var(--bg-black); }
+
   .settings-hint{ font-size:calc(var(--unit)*0.82); color:var(--phosphor-dim); margin-bottom:calc(var(--unit)*0.4); flex:0 0 auto; }
   .settings-editor{
     flex:1 1 auto; min-height:0; width:100%; resize:none;
@@ -711,7 +773,7 @@
 
       <div class="settings-screen" id="settings-screen">
         <div class="settings-header">
-          <span>SETTINGS — CUSTOM DATA EDITOR</span>
+          <span>SETTINGS</span>
           <button class="settings-close" id="settings-close" aria-label="Close">✕</button>
         </div>
         <div class="settings-tabbar" id="settings-tabbar">
@@ -721,12 +783,18 @@
           <div class="chip" data-cat="map">MAP</div>
           <div class="chip" data-cat="holos">DATA</div>
         </div>
-        <div class="settings-hint">Edit the raw JSON below, then SAVE. Invalid JSON will be rejected.</div>
-        <textarea class="settings-editor" id="settings-editor" spellcheck="false"></textarea>
+        <div class="settings-viewtoggle">
+          <div class="chip active" data-view="form">FORM</div>
+          <div class="chip" data-view="json">RAW JSON</div>
+        </div>
+        <div class="settings-body" id="settings-body">
+          <div class="settings-form" id="settings-form"></div>
+          <textarea class="settings-editor" id="settings-editor" spellcheck="false" style="display:none"></textarea>
+        </div>
         <div class="settings-msg" id="settings-msg"></div>
         <div class="settings-actions">
           <button class="actbtn" id="settings-save">SAVE</button>
-          <button class="actbtn" id="settings-reset-cat">RESET THIS TAB</button>
+          <button class="actbtn" id="settings-reset-cat">RESET TAB</button>
           <button class="actbtn" id="settings-reset-all">RESET ALL</button>
         </div>
       </div>
@@ -1513,20 +1581,259 @@
   }
 
   var settingsScreen = document.getElementById('settings-screen');
+  var settingsForm = document.getElementById('settings-form');
   var settingsEditor = document.getElementById('settings-editor');
   var settingsMsg = document.getElementById('settings-msg');
   var settingsTabbar = document.getElementById('settings-tabbar');
+  var settingsViewToggle = document.querySelector('.settings-viewtoggle');
   var currentSettingsCat = 'stat';
+  var settingsDraft = null;
+  var jsonMode = false;
 
-  function loadEditorFor(cat){
-    settingsEditor.value = JSON.stringify(getStateSlice(cat), null, 2);
-    settingsMsg.textContent = '';
-    settingsMsg.className = 'settings-msg';
+  function clearMsg(){ settingsMsg.textContent = ''; settingsMsg.className = 'settings-msg'; }
+  function showMsg(text, ok){ settingsMsg.textContent = text; settingsMsg.className = 'settings-msg' + (ok ? ' ok' : ''); }
+
+  /* ---- tiny form-building helpers ---- */
+  function makeRow(labelText, inputEl){
+    var row = document.createElement('div'); row.className = 'form-row';
+    var lbl = document.createElement('label'); lbl.textContent = labelText;
+    row.appendChild(lbl); row.appendChild(inputEl);
+    return row;
+  }
+  function textInput(value, onChange, narrow){
+    var el = document.createElement('input'); el.type = 'text';
+    el.className = 'form-input' + (narrow ? ' narrow' : '');
+    el.value = value==null ? '' : value;
+    el.addEventListener('input', function(){ onChange(el.value); });
+    return el;
+  }
+  function numberInput(value, onChange, opts){
+    var el = document.createElement('input'); el.type = 'number'; el.className = 'form-input';
+    if(opts){ if(opts.min!=null) el.min=opts.min; if(opts.max!=null) el.max=opts.max; if(opts.step!=null) el.step=opts.step; }
+    el.value = (value==null) ? 0 : value;
+    el.addEventListener('input', function(){ onChange(el.value===''? 0 : Number(el.value)); });
+    return el;
+  }
+  function checkboxInput(value, onChange){
+    var el = document.createElement('input'); el.type = 'checkbox'; el.className = 'form-checkbox';
+    el.checked = !!value;
+    el.addEventListener('change', function(){ onChange(el.checked); });
+    return el;
+  }
+  function textareaInput(value, onChange, rows){
+    var el = document.createElement('textarea'); el.className = 'form-textarea'; el.rows = rows || 2;
+    el.value = value || '';
+    el.addEventListener('input', function(){ onChange(el.value); });
+    return el;
+  }
+  function selectInput(value, options, onChange){
+    var el = document.createElement('select'); el.className = 'form-input';
+    options.forEach(function(opt){
+      var o = document.createElement('option'); o.value = opt; o.textContent = opt.toUpperCase();
+      if(opt === value) o.selected = true;
+      el.appendChild(o);
+    });
+    el.addEventListener('change', function(){ onChange(el.value); });
+    return el;
+  }
+  function addBtn(label, onClick){
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'form-add';
+    b.textContent = label;
+    b.addEventListener('click', onClick);
+    return b;
+  }
+  function removeBtn(label, onClick){
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'form-remove';
+    b.textContent = label || '✕ REMOVE';
+    b.addEventListener('click', onClick);
+    return b;
+  }
+  function card(){
+    var c = document.createElement('div'); c.className = 'form-card';
+    return c;
+  }
+  function sectionTitle(text){
+    var h = document.createElement('div'); h.className = 'form-section-title'; h.textContent = text;
+    return h;
+  }
+  function subTitle(text){
+    var h = document.createElement('div'); h.className = 'form-sub-title'; h.textContent = text;
+    return h;
+  }
+
+  /* ---- per-category form builders (all read/write directly into settingsDraft) ---- */
+  function buildStatForm(container, draft){
+    container.appendChild(sectionTitle('IDENTITY'));
+    container.appendChild(makeRow('Name', textInput(draft.name, function(v){ draft.name = v; })));
+    container.appendChild(makeRow('Level', numberInput(draft.level, function(v){ draft.level = v; })));
+    container.appendChild(makeRow('Age', textInput(draft.age, function(v){ draft.age = v; })));
+    container.appendChild(makeRow('XP Text', textInput(draft.xp, function(v){ draft.xp = v; })));
+    container.appendChild(makeRow('XP Bar %', numberInput(draft.xpPct, function(v){ draft.xpPct = v; }, {min:0,max:100})));
+
+    container.appendChild(sectionTitle('VITALS'));
+    [['hp','Hit Points'],['ap','Action Points'],['rad','Rad Level'],['poison','Poison']].forEach(function(pair){
+      var key = pair[0], label = pair[1];
+      container.appendChild(makeRow(label+' Text', textInput(draft[key].text, function(v){ draft[key].text = v; })));
+      container.appendChild(makeRow(label+' Bar %', numberInput(draft[key].pct, function(v){ draft[key].pct = v; }, {min:0,max:100})));
+    });
+
+    container.appendChild(sectionTitle('S.P.E.C.I.A.L.'));
+    draft.special.forEach(function(sp, idx){
+      var row = document.createElement('div'); row.className = 'form-inline-row';
+      row.appendChild(textInput(sp.abbr, function(v){ sp.abbr = v; }, true));
+      row.appendChild(textInput(sp.name, function(v){ sp.name = v; }));
+      row.appendChild(numberInput(sp.val, function(v){ sp.val = v; }, {min:0,max:10}));
+      row.appendChild(removeBtn('✕', function(){ draft.special.splice(idx,1); renderSettingsForm(); }));
+      container.appendChild(row);
+    });
+    container.appendChild(addBtn('+ ADD S.P.E.C.I.A.L. STAT', function(){
+      draft.special.push({abbr:'NEW', name:'New Stat', val:5});
+      renderSettingsForm();
+    }));
+
+    container.appendChild(sectionTitle('DERIVED STATISTICS'));
+    draft.derived.forEach(function(d, idx){
+      var row = document.createElement('div'); row.className = 'form-inline-row';
+      row.appendChild(textInput(d[0], function(v){ d[0] = v; }));
+      row.appendChild(textInput(d[1], function(v){ d[1] = v; }));
+      row.appendChild(removeBtn('✕', function(){ draft.derived.splice(idx,1); renderSettingsForm(); }));
+      container.appendChild(row);
+    });
+    container.appendChild(addBtn('+ ADD DERIVED STATISTIC', function(){
+      draft.derived.push(['New Statistic','0']);
+      renderSettingsForm();
+    }));
+  }
+
+  function buildItemsForm(container, draft){
+    container.appendChild(makeRow('Max Carry Weight', numberInput(draft.maxWeight, function(v){ draft.maxWeight = v; }, {min:0})));
+    container.appendChild(sectionTitle('ITEMS'));
+    draft.list.forEach(function(it, idx){
+      var c = card();
+      c.appendChild(makeRow('Name', textInput(it.name, function(v){ it.name = v; })));
+      c.appendChild(makeRow('Category', textInput(it.cat, function(v){ it.cat = v; })));
+      c.appendChild(makeRow('Weight (lb)', numberInput(it.wt, function(v){ it.wt = v; }, {min:0, step:0.5})));
+      c.appendChild(makeRow('Value (caps)', numberInput(it.val, function(v){ it.val = v; }, {min:0})));
+      c.appendChild(makeRow('Quantity', numberInput(it.qty||1, function(v){ it.qty = v; }, {min:1})));
+      c.appendChild(makeRow('Equipped', checkboxInput(it.equipped, function(v){ it.equipped = v; })));
+      c.appendChild(makeRow('Description', textareaInput(it.desc, function(v){ it.desc = v; }, 2)));
+      c.appendChild(removeBtn('✕ REMOVE ITEM', function(){ draft.list.splice(idx,1); renderSettingsForm(); }));
+      container.appendChild(c);
+    });
+    container.appendChild(addBtn('+ ADD ITEM', function(){
+      draft.list.push({name:'New Item', cat:'Misc', wt:0, val:0, equipped:false, desc:''});
+      renderSettingsForm();
+    }));
+  }
+
+  function buildQuestsForm(container, draft){
+    container.appendChild(sectionTitle('QUESTS'));
+    draft.forEach(function(q, idx){
+      var c = card();
+      c.appendChild(makeRow('Name', textInput(q.name, function(v){ q.name = v; })));
+      c.appendChild(makeRow('Location', textInput(q.loc, function(v){ q.loc = v; })));
+      c.appendChild(makeRow('Complete', checkboxInput(q.complete, function(v){ q.complete = v; })));
+      c.appendChild(makeRow('Description', textareaInput(q.text, function(v){ q.text = v; }, 2)));
+      c.appendChild(subTitle('Objectives'));
+      if(!q.obj) q.obj = [];
+      q.obj.forEach(function(o, oidx){
+        var row = document.createElement('div'); row.className = 'form-inline-row';
+        row.appendChild(checkboxInput(o.done, function(v){ o.done = v; }));
+        row.appendChild(textInput(o.t, function(v){ o.t = v; }));
+        row.appendChild(removeBtn('✕', function(){ q.obj.splice(oidx,1); renderSettingsForm(); }));
+        c.appendChild(row);
+      });
+      c.appendChild(addBtn('+ ADD OBJECTIVE', function(){
+        q.obj.push({t:'New objective', done:false});
+        renderSettingsForm();
+      }));
+      c.appendChild(removeBtn('✕ REMOVE QUEST', function(){ draft.splice(idx,1); renderSettingsForm(); }));
+      container.appendChild(c);
+    });
+    container.appendChild(addBtn('+ ADD QUEST', function(){
+      draft.push({name:'New Quest', loc:'', complete:false, obj:[], text:''});
+      renderSettingsForm();
+    }));
+  }
+
+  function buildMapForm(container, draft){
+    container.appendChild(sectionTitle('WORLD MAP CENTER'));
+    container.appendChild(makeRow('Latitude', numberInput(draft.center.lat, function(v){ draft.center.lat = v; }, {step:0.0001})));
+    container.appendChild(makeRow('Longitude', numberInput(draft.center.lng, function(v){ draft.center.lng = v; }, {step:0.0001})));
+    container.appendChild(makeRow('Zoom', numberInput(draft.center.zoom, function(v){ draft.center.zoom = v; }, {min:1,max:19})));
+
+    container.appendChild(sectionTitle('WORLD MAP MARKERS'));
+    draft.markers.forEach(function(m, idx){
+      var c = card();
+      c.appendChild(makeRow('Name', textInput(m.name, function(v){ m.name = v; })));
+      c.appendChild(makeRow('Latitude', numberInput(m.lat, function(v){ m.lat = v; }, {step:0.0001})));
+      c.appendChild(makeRow('Longitude', numberInput(m.lng, function(v){ m.lng = v; }, {step:0.0001})));
+      c.appendChild(makeRow('Popup Text', textInput(m.popup, function(v){ m.popup = v; })));
+      c.appendChild(removeBtn('✕ REMOVE MARKER', function(){ draft.markers.splice(idx,1); renderSettingsForm(); }));
+      container.appendChild(c);
+    });
+    container.appendChild(addBtn('+ ADD MARKER', function(){
+      draft.markers.push({name:'New Marker', lat:draft.center.lat, lng:draft.center.lng, popup:'NEW MARKER'});
+      renderSettingsForm();
+    }));
+
+    container.appendChild(sectionTitle('AUTOMAP LOCATIONS'));
+    draft.automap.forEach(function(loc, idx){
+      var c = card();
+      c.appendChild(makeRow('Name', textInput(loc.name, function(v){ loc.name = v; })));
+      c.appendChild(makeRow('X (0-1)', numberInput(loc.x, function(v){ loc.x = v; }, {min:0,max:1,step:0.01})));
+      c.appendChild(makeRow('Y (0-1)', numberInput(loc.y, function(v){ loc.y = v; }, {min:0,max:1,step:0.01})));
+      c.appendChild(makeRow('Known', checkboxInput(loc.known, function(v){ loc.known = v; })));
+      c.appendChild(makeRow('Is Player', checkboxInput(loc.player, function(v){ loc.player = v; })));
+      c.appendChild(removeBtn('✕ REMOVE LOCATION', function(){ draft.automap.splice(idx,1); renderSettingsForm(); }));
+      container.appendChild(c);
+    });
+    container.appendChild(addBtn('+ ADD AUTOMAP LOCATION', function(){
+      draft.automap.push({name:'New Location', x:0.5, y:0.5, known:true, player:false});
+      renderSettingsForm();
+    }));
+  }
+
+  function buildHolosForm(container, draft){
+    container.appendChild(sectionTitle('HOLODISKS, NOTES & RADIO'));
+    draft.forEach(function(h, idx){
+      var c = card();
+      c.appendChild(makeRow('Name', textInput(h.name, function(v){ h.name = v; })));
+      c.appendChild(makeRow('Subtitle (optional)', textInput(h.sub, function(v){ h.sub = v; })));
+      c.appendChild(makeRow('Type', selectInput(h.type || 'note', ['note','radio'], function(v){ h.type = v; })));
+      c.appendChild(makeRow('Text', textareaInput(h.text, function(v){ h.text = v; }, 3)));
+      c.appendChild(removeBtn('✕ REMOVE ENTRY', function(){ draft.splice(idx,1); renderSettingsForm(); }));
+      container.appendChild(c);
+    });
+    container.appendChild(addBtn('+ ADD ENTRY', function(){
+      draft.push({name:'New Entry', text:'', type:'note'});
+      renderSettingsForm();
+    }));
+  }
+
+  function renderSettingsForm(){
+    settingsForm.innerHTML = '';
+    if(currentSettingsCat === 'stat') buildStatForm(settingsForm, settingsDraft);
+    else if(currentSettingsCat === 'items') buildItemsForm(settingsForm, settingsDraft);
+    else if(currentSettingsCat === 'quests') buildQuestsForm(settingsForm, settingsDraft);
+    else if(currentSettingsCat === 'map') buildMapForm(settingsForm, settingsDraft);
+    else if(currentSettingsCat === 'holos') buildHolosForm(settingsForm, settingsDraft);
+  }
+
+  function openCategory(cat){
+    currentSettingsCat = cat;
+    settingsDraft = clone(getStateSlice(cat));
+    jsonMode = false;
+    settingsForm.style.display = 'block';
+    settingsEditor.style.display = 'none';
+    settingsViewToggle.querySelectorAll('.chip').forEach(function(c){ c.classList.toggle('active', c.dataset.view==='form'); });
+    renderSettingsForm();
+    clearMsg();
   }
 
   document.getElementById('settings-btn').addEventListener('click', function(){
     settingsScreen.classList.add('open');
-    loadEditorFor(currentSettingsCat);
+    openCategory(currentSettingsCat);
   });
   document.getElementById('settings-close').addEventListener('click', function(){
     settingsScreen.classList.remove('open');
@@ -1535,38 +1842,69 @@
     chip.addEventListener('click', function(){
       settingsTabbar.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
       chip.classList.add('active');
-      currentSettingsCat = chip.dataset.cat;
-      loadEditorFor(currentSettingsCat);
+      openCategory(chip.dataset.cat);
     });
   });
+
+  settingsViewToggle.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var wantJson = chip.dataset.view === 'json';
+      if(wantJson === jsonMode) return;
+
+      if(wantJson){
+        // switching FORM -> JSON: dump the current draft into the textarea
+        settingsEditor.value = JSON.stringify(settingsDraft, null, 2);
+        settingsForm.style.display = 'none';
+        settingsEditor.style.display = 'block';
+        jsonMode = true;
+      } else {
+        // switching JSON -> FORM: parse the textarea back into the draft first
+        try{
+          settingsDraft = JSON.parse(settingsEditor.value);
+          renderSettingsForm();
+          settingsForm.style.display = 'block';
+          settingsEditor.style.display = 'none';
+          jsonMode = false;
+          clearMsg();
+        }catch(e){
+          showMsg('INVALID JSON — fix it or it cannot switch back to FORM view.', false);
+          return;
+        }
+      }
+      settingsViewToggle.querySelectorAll('.chip').forEach(function(c){ c.classList.toggle('active', c.dataset.view === (jsonMode?'json':'form')); });
+    });
+  });
+
   document.getElementById('settings-save').addEventListener('click', function(){
     try{
-      var parsed = JSON.parse(settingsEditor.value);
-      setStateSlice(currentSettingsCat, parsed);
+      if(jsonMode){
+        settingsDraft = JSON.parse(settingsEditor.value);
+      }
+      setStateSlice(currentSettingsCat, settingsDraft);
       renderCategory(currentSettingsCat);
       persistState();
-      settingsMsg.textContent = 'SAVED.';
-      settingsMsg.className = 'settings-msg ok';
+      showMsg('SAVED.', true);
     }catch(e){
-      settingsMsg.textContent = 'INVALID JSON — ' + e.message;
-      settingsMsg.className = 'settings-msg';
+      showMsg('INVALID JSON — ' + e.message, false);
     }
   });
   document.getElementById('settings-reset-cat').addEventListener('click', function(){
-    setStateSlice(currentSettingsCat, clone(getDefaultSlice(currentSettingsCat)));
+    settingsDraft = clone(getDefaultSlice(currentSettingsCat));
+    setStateSlice(currentSettingsCat, clone(settingsDraft));
     renderCategory(currentSettingsCat);
-    loadEditorFor(currentSettingsCat);
+    if(jsonMode){ settingsEditor.value = JSON.stringify(settingsDraft, null, 2); }
+    else { renderSettingsForm(); }
     persistState();
-    settingsMsg.textContent = 'THIS TAB RESET TO DEFAULT.';
-    settingsMsg.className = 'settings-msg ok';
+    showMsg('THIS TAB RESET TO DEFAULT.', true);
   });
   document.getElementById('settings-reset-all').addEventListener('click', function(){
     STATE = clone(DEFAULT_STATE);
     renderAllCategories();
-    loadEditorFor(currentSettingsCat);
+    settingsDraft = clone(getStateSlice(currentSettingsCat));
+    if(jsonMode){ settingsEditor.value = JSON.stringify(settingsDraft, null, 2); }
+    else { renderSettingsForm(); }
     persistState();
-    settingsMsg.textContent = 'ALL DATA RESET TO DEFAULT.';
-    settingsMsg.className = 'settings-msg ok';
+    showMsg('ALL DATA RESET TO DEFAULT.', true);
   });
 
   /* ================= PERSISTENCE ================= */
