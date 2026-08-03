@@ -616,8 +616,19 @@
     .derived-grid{ grid-template-columns:repeat(3,1fr); }
   }
   @media (min-width:1000px){
-    .device{ padding: 2rem; }
-    .bezel{ max-width:900px; margin:0 auto; }
+    html,body{
+      display:flex; align-items:center; justify-content:center;
+    }
+    .device{
+      position:relative;
+      inset:auto;
+      width:min(92vw, 560px);
+      height:min(92dvh, 1040px);
+      --unit: clamp(0.75rem, 1.3vmin, 1.35rem);
+      border-radius: 1.4rem;
+      overflow:hidden;
+      box-shadow: 0 24px 70px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.04);
+    }
   }
 </style>
 </head>
