@@ -54,11 +54,17 @@
     letter-spacing:0.18em;
     flex: 0 0 auto;
   }
+  .case-brand .rivet-row{
+    border:none; background:transparent; padding:calc(var(--unit)*0.3); margin:calc(var(--unit)*-0.3);
+    cursor:pointer; display:inline-flex; align-items:center;
+  }
   .case-brand .rivet-row span{
     display:inline-block; width:calc(var(--unit)*0.5); height:calc(var(--unit)*0.5);
     border-radius:50%; background:#15160f; margin-left:calc(var(--unit)*0.4);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.05);
+    transition: background .15s ease;
   }
+  .case-brand .rivet-row:hover span, .case-brand .rivet-row:active span{ background:var(--phosphor-dim); }
 
   /* ============ SCREEN BEZEL ============ */
   .bezel{
@@ -497,6 +503,48 @@
     .boot-logo{ animation:none; opacity:1; }
   }
 
+  .settings-screen{
+    display:none;
+    position:absolute; inset:0; z-index:40;
+    background: var(--screen-bg);
+    color:var(--phosphor);
+    flex-direction:column;
+    padding: calc(var(--unit)*1.1) calc(var(--unit)*1.2) calc(var(--unit)*0.9);
+    text-shadow: 0 0 2px rgba(79,232,99,.55);
+  }
+  .settings-screen.open{ display:flex; }
+  .settings-header{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-display); font-size:calc(var(--unit)*1.3);
+    letter-spacing:.06em; border-bottom:2px solid var(--phosphor-dim);
+    padding-bottom:calc(var(--unit)*0.5); margin-bottom:calc(var(--unit)*0.6);
+    flex:0 0 auto;
+  }
+  .settings-close{
+    background:transparent; border:1px solid var(--phosphor-dim); color:var(--phosphor);
+    font-family:var(--font-body); font-size:calc(var(--unit)*1.1);
+    width:calc(var(--unit)*1.8); height:calc(var(--unit)*1.8); border-radius:3px; cursor:pointer;
+  }
+  .settings-close:active{ background:var(--phosphor); color:var(--bg-black); }
+  .settings-tabbar{ display:flex; gap:calc(var(--unit)*0.4); flex:0 0 auto; margin-bottom:calc(var(--unit)*0.5); flex-wrap:wrap; }
+  .settings-tabbar .chip{ flex:1 1 auto; text-align:center; min-width:calc(var(--unit)*4); }
+  .settings-hint{ font-size:calc(var(--unit)*0.82); color:var(--phosphor-dim); margin-bottom:calc(var(--unit)*0.4); flex:0 0 auto; }
+  .settings-editor{
+    flex:1 1 auto; min-height:0; width:100%; resize:none;
+    background:rgba(0,0,0,.35); color:var(--phosphor-bright);
+    border:1px solid var(--phosphor-dim); border-radius:3px;
+    font-family:var(--font-body); font-size:calc(var(--unit)*0.92); line-height:1.5;
+    padding:calc(var(--unit)*0.6); text-shadow:none;
+  }
+  .settings-editor:focus{ outline:none; border-color:var(--phosphor); }
+  .settings-msg{
+    font-size:calc(var(--unit)*0.88); min-height:1.6em; flex:0 0 auto;
+    margin-top:calc(var(--unit)*0.4); color:var(--amber);
+  }
+  .settings-msg.ok{ color:var(--phosphor-bright); }
+  .settings-actions{ display:flex; gap:calc(var(--unit)*0.5); flex:0 0 auto; margin-top:calc(var(--unit)*0.2); flex-wrap:wrap; }
+  .settings-actions .actbtn{ flex:1 1 auto; min-width:calc(var(--unit)*6); }
+
   /* ===== MAP PANEL ===== */
   .map-modebar{ display:flex; gap:calc(var(--unit)*0.5); margin-bottom:calc(var(--unit)*0.6); }
   .map-modebar .chip{ flex:1; text-align:center; }
@@ -638,7 +686,7 @@
 
   <div class="case-brand">
     <span>ROBCO<span style="opacity:.5">&nbsp;INDUSTRIES™</span></span>
-    <span class="rivet-row"><span></span><span></span><span></span></span>
+    <button class="rivet-row" id="settings-btn" aria-label="Settings"><span></span><span></span><span></span></button>
   </div>
 
   <div class="bezel">
@@ -661,6 +709,28 @@
         <div id="boot-lines"></div>
       </div>
 
+      <div class="settings-screen" id="settings-screen">
+        <div class="settings-header">
+          <span>SETTINGS — CUSTOM DATA EDITOR</span>
+          <button class="settings-close" id="settings-close" aria-label="Close">✕</button>
+        </div>
+        <div class="settings-tabbar" id="settings-tabbar">
+          <div class="chip active" data-cat="stat">STAT</div>
+          <div class="chip" data-cat="items">ITEMS</div>
+          <div class="chip" data-cat="quests">QUESTS</div>
+          <div class="chip" data-cat="map">MAP</div>
+          <div class="chip" data-cat="holos">DATA</div>
+        </div>
+        <div class="settings-hint">Edit the raw JSON below, then SAVE. Invalid JSON will be rejected.</div>
+        <textarea class="settings-editor" id="settings-editor" spellcheck="false"></textarea>
+        <div class="settings-msg" id="settings-msg"></div>
+        <div class="settings-actions">
+          <button class="actbtn" id="settings-save">SAVE</button>
+          <button class="actbtn" id="settings-reset-cat">RESET THIS TAB</button>
+          <button class="actbtn" id="settings-reset-all">RESET ALL</button>
+        </div>
+      </div>
+
       <div class="screen-inner">
         <div class="topline">
           <span class="title">PIP-BOY 2000</span>
@@ -680,31 +750,31 @@
           <!-- ===================== STAT PANEL ===================== -->
           <div class="panel active" id="panel-stat">
             <div class="scrollarea">
-              <div class="id-row"><b>THE CHOSEN ONE</b><span>LEVEL 99</span></div>
-              <div class="id-row"><span>XP 999,999 / 999,999</span><span>AGE ?</span></div>
-              <div class="bar-outer"><div class="bar-inner" style="width:100%"></div></div>
+              <div class="id-row"><b id="stat-name">THE CHOSEN ONE</b><span>LEVEL <span id="stat-level">99</span></span></div>
+              <div class="id-row"><span>XP <span id="stat-xp">999,999 / 999,999</span></span><span>AGE <span id="stat-age">?</span></span></div>
+              <div class="bar-outer"><div class="bar-inner" id="stat-xp-bar" style="width:100%"></div></div>
 
               <div class="section-label">VITALS</div>
               <div class="vital-grid">
                 <div class="vital">
                   <div class="label">HIT POINTS</div>
-                  <div class="value">62 / 80</div>
-                  <div class="bar-outer"><div class="bar-inner" style="width:77%"></div></div>
+                  <div class="value" id="vital-hp-value">62 / 80</div>
+                  <div class="bar-outer"><div class="bar-inner" id="vital-hp-bar" style="width:77%"></div></div>
                 </div>
                 <div class="vital">
                   <div class="label">ACTION POINTS</div>
-                  <div class="value">9 / 9</div>
-                  <div class="bar-outer"><div class="bar-inner" style="width:100%"></div></div>
+                  <div class="value" id="vital-ap-value">9 / 9</div>
+                  <div class="bar-outer"><div class="bar-inner" id="vital-ap-bar" style="width:100%"></div></div>
                 </div>
                 <div class="vital">
                   <div class="label">RAD LEVEL</div>
-                  <div class="value">140 rads</div>
-                  <div class="bar-outer"><div class="bar-inner warn" style="width:28%"></div></div>
+                  <div class="value" id="vital-rad-value">140 rads</div>
+                  <div class="bar-outer"><div class="bar-inner warn" id="vital-rad-bar" style="width:28%"></div></div>
                 </div>
                 <div class="vital">
                   <div class="label">POISON</div>
-                  <div class="value">0</div>
-                  <div class="bar-outer"><div class="bar-inner" style="width:0%"></div></div>
+                  <div class="value" id="vital-poison-value">0</div>
+                  <div class="bar-outer"><div class="bar-inner" id="vital-poison-bar" style="width:0%"></div></div>
                 </div>
               </div>
 
@@ -956,86 +1026,181 @@
     }
   });
 
-  /* ================= DATA ================= */
-  var special = [
-    {abbr:'ST', name:'Strength', val:6},
-    {abbr:'PE', name:'Perception', val:7},
-    {abbr:'EN', name:'Endurance', val:5},
-    {abbr:'CH', name:'Charisma', val:4},
-    {abbr:'IN', name:'Intelligence', val:8},
-    {abbr:'AG', name:'Agility', val:7},
-    {abbr:'LK', name:'Luck', val:6}
-  ];
-  var specialList = document.getElementById('special-list');
-  special.forEach(function(s){
-    var row = document.createElement('div');
-    row.className = 'special-row';
-    var pips = '';
-    for(var i=1;i<=10;i++){ pips += '<div class="pip'+(i<=s.val?' on':'')+'"></div>'; }
-    row.innerHTML =
-      '<div class="abbr" title="'+s.name+'">'+s.abbr+'</div>' +
-      '<div class="pip-track">'+pips+'</div>' +
-      '<div class="num">'+s.val+'</div>';
-    specialList.appendChild(row);
-  });
+  /* ================= UTILITIES ================= */
+  function esc(v){
+    return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+  function setText(id, val){ var el = document.getElementById(id); if(el) el.textContent = val; }
+  function setWidth(id, pct){ var el = document.getElementById(id); if(el) el.style.width = Math.max(0, Math.min(100, Number(pct)||0)) + '%'; }
 
-  var derived = [
-    ['Armor Class','18'], ['Sequence','14'], ['Healing Rate','2'], ['Crit. Chance','12%'],
-    ['Melee Damage','4'], ['Carry Weight','175 lb'], ['Damage Res.','15%'], ['Poison Res.','20%']
-  ];
-  var derivedList = document.getElementById('derived-list');
-  derived.forEach(function(d){
-    var row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = '<span>'+d[0]+'</span><span class="v">'+d[1]+'</span>';
-    derivedList.appendChild(row);
-  });
+  /* ================= DEFAULT DATA / STATE ================= */
+  var DEFAULT_STATE = {
+    stat: {
+      name: 'THE CHOSEN ONE',
+      level: 99,
+      xp: '999,999 / 999,999',
+      xpPct: 100,
+      age: '?',
+      hp: { text:'62 / 80', pct:77 },
+      ap: { text:'9 / 9', pct:100 },
+      rad: { text:'140 rads', pct:28 },
+      poison: { text:'0', pct:0 },
+      special: [
+        {abbr:'ST', name:'Strength', val:6},
+        {abbr:'PE', name:'Perception', val:7},
+        {abbr:'EN', name:'Endurance', val:5},
+        {abbr:'CH', name:'Charisma', val:4},
+        {abbr:'IN', name:'Intelligence', val:8},
+        {abbr:'AG', name:'Agility', val:7},
+        {abbr:'LK', name:'Luck', val:6}
+      ],
+      derived: [
+        ['Armor Class','18'], ['Sequence','14'], ['Healing Rate','2'], ['Crit. Chance','12%'],
+        ['Melee Damage','4'], ['Carry Weight','175 lb'], ['Damage Res.','15%'], ['Poison Res.','20%']
+      ]
+    },
+    items: {
+      maxWeight: 175,
+      list: [
+        {name:'10mm Pistol', cat:'Weapon', wt:3, val:100, equipped:true, desc:'Standard sidearm. Reliable, low maintenance, chambered for 10mm rounds.'},
+        {name:'Combat Knife', cat:'Weapon', wt:2, val:8, equipped:false, desc:'Serrated steel blade. Fast, quiet, and always ready.'},
+        {name:'Leather Armor', cat:'Apparel', wt:8, val:70, equipped:true, desc:'Boiled leather plating stitched over canvas. Modest protection, minimal encumbrance.'},
+        {name:'Stimpak', cat:'Aid', wt:1, val:75, qty:4, desc:'Pressurized syringe of healing chemicals. Restores hit points instantly.'},
+        {name:'RadAway', cat:'Aid', wt:1, val:90, qty:2, desc:'IV drip that purges radiation from the bloodstream over several minutes.'},
+        {name:'Geiger Counter', cat:'Misc', wt:1, val:45, desc:'Clicks faster near irradiated material. Essential wasteland gear.'},
+        {name:'Bottle Caps', cat:'Misc', wt:0, val:1, qty:238, desc:'Currency of the wastes.'},
+        {name:'Holotape: Vault 13', cat:'Misc', wt:0, val:0, desc:'An old recorded log. Might be worth listening to.'}
+      ]
+    },
+    quests: [
+      {name:'Defeat the Enclave in Oklahoma', loc:'Oklahoma Wasteland', complete:false, obj:[
+        {t:'Track the Enclave remnant east', done:true},
+        {t:'Rally the wasteland tribes', done:true},
+        {t:'Locate the Enclave stronghold', done:false},
+        {t:'Bring down the Enclave for good', done:false}
+      ], text:'Years after the GECK and the water chip, word reaches the Chosen One that Enclave survivors have regrouped in Oklahoma. This is where the story continues.'},
+      {name:'Find the GECK', loc:'Vault 13', complete:true, obj:[
+        {t:'Speak with the Elder', done:true},
+        {t:'Travel to Vault 15', done:true},
+        {t:'Locate the Garden of Eden Creation Kit', done:true}
+      ], text:'The village needed a working water chip replacement. The GECK was recovered.'},
+      {name:'Rescue the Missing Villager', loc:'Klamath', complete:true, obj:[
+        {t:'Ask around Klamath', done:true},
+        {t:'Track the trail north', done:true},
+        {t:'Return the villager home', done:true}
+      ], text:'The missing villager was found near the old dam and brought safely home.'},
+      {name:'Repair the Water Chip', loc:'Vault 13', complete:true, obj:[
+        {t:'Locate a replacement chip', done:true},
+        {t:'Install in Vault 13 systems', done:true}
+      ], text:'The water chip has been replaced. Vault 13 has clean water for another 150 years.'}
+    ],
+    holos: [
+      {name:'Overseer\'s Log — Entry 14', text:'The chip failure was inevitable. We should have rotated stock decades ago. Sending our best out was the only option left.'},
+      {name:'Trader\'s Note', text:'Left the caps with Vic. Tell him the deal for the water flask still stands if he makes it back from Klamath.'},
+      {name:'Unknown Frequency', text:'...signal degrades badly this far south, repeat, this is not a drill, the herd is moving toward...', sub:'Okie News Radio Frequency', type:'radio'}
+    ],
+    automap: [
+      {name:'Vault 13', x:0.5, y:0.82, known:true, player:true},
+      {name:'Klamath', x:0.28, y:0.6, known:true},
+      {name:'The Den', x:0.4, y:0.42, known:true},
+      {name:'Modoc', x:0.62, y:0.5, known:true},
+      {name:'New Reno', x:0.55, y:0.24, known:false},
+      {name:'NCR', x:0.78, y:0.68, known:false}
+    ],
+    worldmap: {
+      center: { lat:35.2887, lng:-95.6475, zoom:8 },
+      markers: [
+        {name:'Eufaula, Oklahoma', lat:35.2887, lng:-95.6475, popup:'EUFAULA, OKLAHOMA — LAST KNOWN POSITION'},
+        {name:'Vault 66', lat:35.6528, lng:-97.2939, popup:'VAULT 66 — Caps Restaurant, Arcadia'},
+        {name:'Vault 113', lat:36.1540, lng:-95.9928, popup:'VAULT 113 — Tulsa'}
+      ]
+    },
+    location: 'ARROYO — SOUTH'
+  };
 
-  /* ================= ITEMS ================= */
-  var items = [
-    {name:'10mm Pistol', cat:'Weapon', wt:3, val:100, equipped:true, desc:'Standard sidearm. Reliable, low maintenance, chambered for 10mm rounds.'},
-    {name:'Combat Knife', cat:'Weapon', wt:2, val:8, equipped:false, desc:'Serrated steel blade. Fast, quiet, and always ready.'},
-    {name:'Leather Armor', cat:'Apparel', wt:8, val:70, equipped:true, desc:'Boiled leather plating stitched over canvas. Modest protection, minimal encumbrance.'},
-    {name:'Stimpak', cat:'Aid', wt:1, val:75, qty:4, desc:'Pressurized syringe of healing chemicals. Restores hit points instantly.'},
-    {name:'RadAway', cat:'Aid', wt:1, val:90, qty:2, desc:'IV drip that purges radiation from the bloodstream over several minutes.'},
-    {name:"Geiger Counter", cat:'Misc', wt:1, val:45, desc:'Clicks faster near irradiated material. Essential wasteland gear.'},
-    {name:'Bottle Caps', cat:'Misc', wt:0, val:1, qty:238, desc:'Currency of the wastes.'},
-    {name:'Holotape: Vault 13', cat:'Misc', wt:0, val:0, desc:'An old recorded log. Might be worth listening to.'}
-  ];
-  var cats = ['All','Weapon','Apparel','Aid','Misc'];
+  var STATE = clone(DEFAULT_STATE);
   var activeCat = 'All';
   var selectedIdx = null;
+  var worldInited = false;
 
-  var filterbar = document.getElementById('item-filters');
-  cats.forEach(function(c){
-    var chip = document.createElement('div');
-    chip.className = 'chip' + (c===activeCat ? ' active':'');
-    chip.textContent = c.toUpperCase();
-    chip.addEventListener('click', function(){
-      activeCat = c;
-      document.querySelectorAll('#item-filters .chip').forEach(function(ch){ ch.classList.remove('active'); });
-      chip.classList.add('active');
-      renderItems();
+  /* ================= STAT RENDER ================= */
+  function renderStat(){
+    var s = STATE.stat;
+    setText('stat-name', s.name);
+    setText('stat-level', s.level);
+    setText('stat-xp', s.xp);
+    setText('stat-age', s.age);
+    setWidth('stat-xp-bar', s.xpPct);
+    setText('vital-hp-value', s.hp.text);       setWidth('vital-hp-bar', s.hp.pct);
+    setText('vital-ap-value', s.ap.text);       setWidth('vital-ap-bar', s.ap.pct);
+    setText('vital-rad-value', s.rad.text);     setWidth('vital-rad-bar', s.rad.pct);
+    setText('vital-poison-value', s.poison.text); setWidth('vital-poison-bar', s.poison.pct);
+
+    var specialList = document.getElementById('special-list');
+    specialList.innerHTML = '';
+    (s.special||[]).forEach(function(sp){
+      var row = document.createElement('div');
+      row.className = 'special-row';
+      var pips = '';
+      for(var i=1;i<=10;i++){ pips += '<div class="pip'+(i<=sp.val?' on':'')+'"></div>'; }
+      row.innerHTML =
+        '<div class="abbr" title="'+esc(sp.name)+'">'+esc(sp.abbr)+'</div>' +
+        '<div class="pip-track">'+pips+'</div>' +
+        '<div class="num">'+esc(sp.val)+'</div>';
+      specialList.appendChild(row);
     });
-    filterbar.appendChild(chip);
-  });
+
+    var derivedList = document.getElementById('derived-list');
+    derivedList.innerHTML = '';
+    (s.derived||[]).forEach(function(d){
+      var row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = '<span>'+esc(d[0])+'</span><span class="v">'+esc(d[1])+'</span>';
+      derivedList.appendChild(row);
+    });
+  }
+
+  /* ================= ITEMS ================= */
+  function getItemCategories(){
+    var set = {};
+    STATE.items.list.forEach(function(it){ set[it.cat||'Misc'] = true; });
+    return ['All'].concat(Object.keys(set));
+  }
+  function renderItemFilters(){
+    var filterbar = document.getElementById('item-filters');
+    filterbar.innerHTML = '';
+    var cats = getItemCategories();
+    if(cats.indexOf(activeCat) === -1) activeCat = 'All';
+    cats.forEach(function(c){
+      var chip = document.createElement('div');
+      chip.className = 'chip' + (c===activeCat ? ' active':'');
+      chip.textContent = c.toUpperCase();
+      chip.addEventListener('click', function(){
+        activeCat = c;
+        renderItemFilters();
+        renderItems();
+      });
+      filterbar.appendChild(chip);
+    });
+  }
 
   function renderItems(){
     var list = document.getElementById('item-list');
     list.innerHTML = '';
-    var totalWt = items.reduce(function(a,i){ return a + i.wt*(i.qty||1); },0);
-    var maxWt = 175;
+    var totalWt = STATE.items.list.reduce(function(a,i){ return a + i.wt*(i.qty||1); },0);
+    var maxWt = STATE.items.maxWeight;
     document.getElementById('weight-readout').textContent = totalWt+' / '+maxWt+' lb';
     document.getElementById('weight-bar').style.width = Math.min(100, (totalWt/maxWt*100))+'%';
 
-    items.forEach(function(it, idx){
+    STATE.items.list.forEach(function(it, idx){
       if(activeCat!=='All' && it.cat!==activeCat) return;
       var row = document.createElement('div');
       row.className = 'item-row'+(it.equipped?' equipped':'');
       row.innerHTML =
         '<span class="eq-mark">'+(it.equipped?'E':'')+'</span>' +
-        '<span class="nm">'+it.name+(it.qty?' x'+it.qty:'')+'</span>' +
-        '<span class="tag">'+it.cat+'</span>' +
+        '<span class="nm">'+esc(it.name)+(it.qty?' x'+esc(it.qty):'')+'</span>' +
+        '<span class="tag">'+esc(it.cat||'')+'</span>' +
         '<span class="wt">'+ (it.wt*(it.qty||1)) +'lb</span>';
       row.addEventListener('click', function(){
         selectedIdx = idx;
@@ -1047,137 +1212,113 @@
 
   function renderDetail(){
     var box = document.getElementById('item-detail');
-    if(selectedIdx===null){ box.innerHTML=''; return; }
-    var it = items[selectedIdx];
+    if(selectedIdx===null || !STATE.items.list[selectedIdx]){ box.innerHTML=''; return; }
+    var it = STATE.items.list[selectedIdx];
     var actionLabel = (it.cat==='Weapon'||it.cat==='Apparel') ? (it.equipped?'UNEQUIP':'EQUIP') : (it.cat==='Aid'?'USE':'INSPECT');
     box.innerHTML =
       '<div class="detail-box">' +
-        '<div class="dname">'+it.name+'</div>' +
-        '<div>'+it.desc+'</div>' +
+        '<div class="dname">'+esc(it.name)+'</div>' +
+        '<div>'+esc(it.desc||'')+'</div>' +
         '<div class="detail-actions">' +
           '<button class="actbtn" id="detail-action">'+actionLabel+'</button>' +
           '<button class="actbtn" id="detail-drop">DROP</button>' +
         '</div>' +
       '</div>';
     document.getElementById('detail-action').addEventListener('click', function(){
-      if(it.cat==='Weapon'||it.cat==='Apparel'){ it.equipped = !it.equipped; renderItems(); renderDetail(); }
+      if(it.cat==='Weapon'||it.cat==='Apparel'){ it.equipped = !it.equipped; renderItems(); renderDetail(); persistState(); }
     });
     document.getElementById('detail-drop').addEventListener('click', function(){
-      items.splice(selectedIdx,1);
+      STATE.items.list.splice(selectedIdx,1);
       selectedIdx = null;
+      renderItemFilters();
       renderItems();
       document.getElementById('item-detail').innerHTML='';
+      persistState();
     });
   }
-  renderItems();
 
   /* ================= QUESTS ================= */
-  var quests = [
-    {name:'Defeat the Enclave in Oklahoma', loc:'Oklahoma Wasteland', complete:false, obj:[
-      {t:'Track the Enclave remnant east', done:true},
-      {t:'Rally the wasteland tribes', done:true},
-      {t:'Locate the Enclave stronghold', done:false},
-      {t:'Bring down the Enclave for good', done:false}
-    ], text:'Years after the GECK and the water chip, word reaches the Chosen One that Enclave survivors have regrouped in Oklahoma. This is where the story continues.'},
-    {name:'Find the GECK', loc:'Vault 13', complete:true, obj:[
-      {t:'Speak with the Elder', done:true},
-      {t:'Travel to Vault 15', done:true},
-      {t:'Locate the Garden of Eden Creation Kit', done:true}
-    ], text:'The village needed a working water chip replacement. The GECK was recovered.'},
-    {name:'Rescue the Missing Villager', loc:'Klamath', complete:true, obj:[
-      {t:'Ask around Klamath', done:true},
-      {t:'Track the trail north', done:true},
-      {t:'Return the villager home', done:true}
-    ], text:'The missing villager was found near the old dam and brought safely home.'},
-    {name:'Repair the Water Chip', loc:'Vault 13', complete:true, obj:[
-      {t:'Locate a replacement chip', done:true},
-      {t:'Install in Vault 13 systems', done:true}
-    ], text:'The water chip has been replaced. Vault 13 has clean water for another 150 years.'}
-  ];
-
   function buildQuestRow(q){
     var el = document.createElement('div');
     el.className = 'quest-item' + (q.complete?' completed':'');
-    var objHtml = q.obj.map(function(o){
-      return '<li class="'+(o.done?'done':'')+'"><span class="mk">'+(o.done?'✓':'›')+'</span>'+o.t+'</li>';
+    var objHtml = (q.obj||[]).map(function(o){
+      return '<li class="'+(o.done?'done':'')+'"><span class="mk">'+(o.done?'✓':'›')+'</span>'+esc(o.t)+'</li>';
     }).join('');
     el.innerHTML =
-      '<div class="quest-head"><span class="qname">'+q.name+'</span><span class="qloc">'+q.loc+'</span></div>' +
-      '<div class="quest-body"><div>'+q.text+'</div><ul class="obj-list">'+objHtml+'</ul></div>';
+      '<div class="quest-head"><span class="qname">'+esc(q.name)+'</span><span class="qloc">'+esc(q.loc||'')+'</span></div>' +
+      '<div class="quest-body"><div>'+esc(q.text||'')+'</div><ul class="obj-list">'+objHtml+'</ul></div>';
     el.addEventListener('click', function(){ el.classList.toggle('open'); });
     return el;
   }
-  var activeWrap = document.getElementById('quest-active');
-  var completeWrap = document.getElementById('quest-complete');
-  quests.forEach(function(q){
-    (q.complete ? completeWrap : activeWrap).appendChild(buildQuestRow(q));
-  });
+  function renderQuests(){
+    var activeWrap = document.getElementById('quest-active');
+    var completeWrap = document.getElementById('quest-complete');
+    activeWrap.innerHTML = '';
+    completeWrap.innerHTML = '';
+    STATE.quests.forEach(function(q){
+      (q.complete ? completeWrap : activeWrap).appendChild(buildQuestRow(q));
+    });
+  }
 
   /* ================= HOLODISKS ================= */
-  var holos = [
-    {name:'Overseer\'s Log — Entry 14', text:'The chip failure was inevitable. We should have rotated stock decades ago. Sending our best out was the only option left.'},
-    {name:'Trader\'s Note', text:'Left the caps with Vic. Tell him the deal for the water flask still stands if he makes it back from Klamath.'},
-    {name:'Unknown Frequency', text:'...signal degrades badly this far south, repeat, this is not a drill, the herd is moving toward...', sub:'Okie News Radio Frequency', type:'radio'}
-  ];
   var radioIconSVG = '<svg class="hicon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9 L20 9 L20 20 L4 20 Z"/><circle cx="8" cy="14.5" r="1.6"/><path d="M12 5 L15 2 M12 5 L9 2"/><path d="M13.5 5.5 L20 9"/></svg>';
   var WAVE_BAR_COUNT = 18;
   var waveBarsHTML = '<div class="hwave">' + '<span></span>'.repeat(WAVE_BAR_COUNT) + '</div>';
 
-  var holoList = document.getElementById('holo-list');
-  holos.forEach(function(h){
-    var wrap = document.createElement('div');
-    wrap.className = 'holo-entry' + (h.type==='radio' ? ' radio' : '');
-    var subHtml = h.sub ? '<div class="hsub">'+h.sub+'</div>' : '';
-    var iconHtml = h.type==='radio' ? radioIconSVG : '';
-    var waveHtml = h.type==='radio' ? waveBarsHTML : '';
-    wrap.innerHTML =
-      '<div class="hname">'+iconHtml+'<span class="harrow">▸</span> '+h.name+'</div>' +
-      subHtml +
-      '<div class="htext">'+h.text+waveHtml+'</div>';
-    wrap.querySelector('.hname').addEventListener('click', function(){
-      var hnameEl = wrap.querySelector('.hname');
-      hnameEl.classList.remove('tap-flash');
-      void hnameEl.offsetWidth; // restart flash if tapped again quickly
-      hnameEl.classList.add('tap-flash');
+  function renderHolos(){
+    var holoList = document.getElementById('holo-list');
+    holoList.innerHTML = '';
+    STATE.holos.forEach(function(h){
+      var wrap = document.createElement('div');
+      wrap.className = 'holo-entry' + (h.type==='radio' ? ' radio' : '');
+      var subHtml = h.sub ? '<div class="hsub">'+esc(h.sub)+'</div>' : '';
+      var iconHtml = h.type==='radio' ? radioIconSVG : '';
+      var waveHtml = h.type==='radio' ? waveBarsHTML : '';
+      wrap.innerHTML =
+        '<div class="hname">'+iconHtml+'<span class="harrow">▸</span> '+esc(h.name)+'</div>' +
+        subHtml +
+        '<div class="htext">'+esc(h.text||'')+waveHtml+'</div>';
+      wrap.querySelector('.hname').addEventListener('click', function(){
+        var hnameEl = wrap.querySelector('.hname');
+        hnameEl.classList.remove('tap-flash');
+        void hnameEl.offsetWidth; // restart flash if tapped again quickly
+        hnameEl.classList.add('tap-flash');
 
-      var opening = !wrap.classList.contains('open');
-      wrap.classList.toggle('open', opening);
-      wrap.classList.toggle('playing', opening && h.type==='radio');
-      if(h.type==='radio'){
-        var bars = wrap.querySelectorAll('.hwave span');
-        if(wrap._waveTimer){ clearInterval(wrap._waveTimer); wrap._waveTimer = null; }
-        if(opening){
-          // seed each bar with its own current level so bars don't all jump in lockstep
-          var levels = Array.prototype.map.call(bars, function(){ return 8 + Math.random()*20; });
-          function tickWave(){
-            bars.forEach(function(bar, i){
-              // biased random walk: mostly small jumps, occasional spikes/drops, like a real audio meter
-              var r = Math.random();
-              var delta;
-              if(r < 0.12){ delta = (Math.random()*70 - 20); }       // occasional big spike/drop
-              else { delta = (Math.random()*36 - 18); }               // usual small jitter
-              var next = levels[i] + delta;
-              next = Math.max(6, Math.min(100, next));
-              // random chance of a near-silent dip, like signal dropout
-              if(Math.random() < 0.05) next = 6 + Math.random()*10;
-              levels[i] = next;
-              bar.style.height = next.toFixed(0) + '%';
-            });
+        var opening = !wrap.classList.contains('open');
+        wrap.classList.toggle('open', opening);
+        wrap.classList.toggle('playing', opening && h.type==='radio');
+        if(h.type==='radio'){
+          var bars = wrap.querySelectorAll('.hwave span');
+          if(wrap._waveTimer){ clearInterval(wrap._waveTimer); wrap._waveTimer = null; }
+          if(opening){
+            var levels = Array.prototype.map.call(bars, function(){ return 8 + Math.random()*20; });
+            function tickWave(){
+              bars.forEach(function(bar, i){
+                var r = Math.random();
+                var delta;
+                if(r < 0.12){ delta = (Math.random()*70 - 20); }
+                else { delta = (Math.random()*36 - 18); }
+                var next = levels[i] + delta;
+                next = Math.max(6, Math.min(100, next));
+                if(Math.random() < 0.05) next = 6 + Math.random()*10;
+                levels[i] = next;
+                bar.style.height = next.toFixed(0) + '%';
+              });
+            }
+            tickWave();
+            wrap._waveTimer = setInterval(tickWave, 90);
+          } else {
+            bars.forEach(function(bar){ bar.style.height = '8%'; });
           }
-          tickWave();
-          wrap._waveTimer = setInterval(tickWave, 90);
-        } else {
-          bars.forEach(function(bar){ bar.style.height = '8%'; });
         }
-      }
+      });
+      holoList.appendChild(wrap);
     });
-    holoList.appendChild(wrap);
-  });
+  }
 
   /* ================= MAP ================= */
   var mapChips = document.querySelectorAll('.map-modebar .chip');
   var mapViews = { automap: document.getElementById('view-automap'), world: document.getElementById('view-world') };
-  var worldInited = false;
 
   mapChips.forEach(function(chip){
     chip.addEventListener('click', function(){
@@ -1200,15 +1341,6 @@
   });
 
   /* --- Automap: fictional wasteland grid with location markers --- */
-  var automapLocs = [
-    {name:'Vault 13', x:0.5, y:0.82, known:true, player:true},
-    {name:'Klamath', x:0.28, y:0.6, known:true},
-    {name:'The Den', x:0.4, y:0.42, known:true},
-    {name:'Modoc', x:0.62, y:0.5, known:true},
-    {name:'New Reno', x:0.55, y:0.24, known:false},
-    {name:'NCR', x:0.78, y:0.68, known:false}
-  ];
-
   function resizeAutomap(){
     var canvas = document.getElementById('automap-canvas');
     var stage = canvas.parentElement;
@@ -1227,19 +1359,16 @@
     ctx.fillStyle = '#020c05';
     ctx.fillRect(0,0,w,h);
 
-    // grid
     ctx.strokeStyle = 'rgba(30,90,42,0.55)';
     ctx.lineWidth = 1;
     var step = Math.max(24, Math.min(w,h)/14);
     for(var x=0; x<=w; x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
     for(var y=0; y<=h; y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
 
-    // unexplored fog patches
     ctx.fillStyle = 'rgba(0,0,0,0.55)';
     ctx.fillRect(0,0,w*0.32,h*0.32);
     ctx.fillRect(w*0.68,0,w*0.32,h*0.22);
 
-    // rough coastline / terrain squiggle for flavor
     ctx.strokeStyle = 'rgba(79,232,99,0.35)';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1248,11 +1377,10 @@
     ctx.bezierCurveTo(w*0.85,h*0.12, w*0.95,h*0.25, w,h*0.2);
     ctx.stroke();
 
-    // routes connecting known locations
     ctx.strokeStyle = 'rgba(79,232,99,0.5)';
     ctx.setLineDash([4,4]);
     ctx.lineWidth = 1.5;
-    var known = automapLocs.filter(function(l){ return l.known; });
+    var known = STATE.automap.filter(function(l){ return l.known; });
     for(var i=0;i<known.length-1;i++){
       ctx.beginPath();
       ctx.moveTo(known[i].x*w, known[i].y*h);
@@ -1261,8 +1389,7 @@
     }
     ctx.setLineDash([]);
 
-    // location markers
-    automapLocs.forEach(function(loc){
+    STATE.automap.forEach(function(loc){
       var px = loc.x*w, py = loc.y*h;
       ctx.beginPath();
       ctx.arc(px, py, loc.player ? 6 : (loc.known?5:4), 0, Math.PI*2);
@@ -1275,7 +1402,7 @@
         ctx.font = '11px "Share Tech Mono", monospace';
         ctx.fillStyle = '#adffb8';
         ctx.textAlign = 'center';
-        ctx.fillText(loc.name.toUpperCase(), px, py-10);
+        ctx.fillText(String(loc.name).toUpperCase(), px, py-10);
       }
     });
   }
@@ -1292,17 +1419,17 @@
     if(worldInited || typeof L === 'undefined') return;
     worldInited = true;
 
+    var c = STATE.worldmap.center;
     var map = L.map('leaflet-map', {
       zoomControl:true,
       attributionControl:true
-    }).setView([35.2887, -95.6475], 8); // default: Eufaula, Oklahoma
+    }).setView([c.lat, c.lng], c.zoom);
 
     var tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // apply the green CRT tint to the tile layer's DOM pane
     tiles.on('load', function(){
       var pane = map.getPane('tilePane');
       if(pane) pane.classList.add('fallout-tiles');
@@ -1310,20 +1437,28 @@
     var pane = map.getPane('tilePane');
     if(pane) pane.classList.add('fallout-tiles');
 
-    var pipIcon = L.divIcon({ className:'', html:'<div class="pipmarker"></div>', iconSize:[14,14] });
-
-    L.marker([35.2887, -95.6475], {icon:pipIcon}).addTo(map)
-      .bindPopup('EUFAULA, OKLAHOMA — LAST KNOWN POSITION');
-
-    // Vault 66 — sited at Caps, the Route 66 soda ranch in Arcadia, OK
-    L.marker([35.6528, -97.2939], {icon:pipIcon}).addTo(map)
-      .bindPopup('VAULT 66 — Caps Restaurant, Arcadia');
-
-    // Vault 113 — Tulsa
-    L.marker([36.1540, -95.9928], {icon:pipIcon}).addTo(map)
-      .bindPopup('VAULT 113 — Tulsa');
-
     window._leafletMap = map;
+    window._pipMarkers = [];
+    renderWorldMapMarkers();
+  }
+
+  function renderWorldMapMarkers(){
+    var map = window._leafletMap;
+    if(!map || typeof L === 'undefined') return;
+    (window._pipMarkers || []).forEach(function(m){ map.removeLayer(m); });
+    window._pipMarkers = [];
+    var pipIcon = L.divIcon({ className:'', html:'<div class="pipmarker"></div>', iconSize:[14,14] });
+    (STATE.worldmap.markers || []).forEach(function(m){
+      var mk = L.marker([m.lat, m.lng], {icon:pipIcon}).addTo(map).bindPopup(esc(m.popup || m.name || ''));
+      window._pipMarkers.push(mk);
+    });
+  }
+
+  function recenterWorldMap(){
+    var map = window._leafletMap;
+    if(!map) return;
+    var c = STATE.worldmap.center;
+    map.setView([c.lat, c.lng], c.zoom);
   }
 
   document.getElementById('locate-btn').addEventListener('click', function(){
@@ -1343,6 +1478,142 @@
       alert('UNABLE TO ACQUIRE SIGNAL');
     });
   });
+
+  /* ================= SETTINGS SCREEN ================= */
+  function getStateSlice(cat){
+    if(cat === 'map') return { center: STATE.worldmap.center, markers: STATE.worldmap.markers, automap: STATE.automap };
+    return STATE[cat];
+  }
+  function setStateSlice(cat, val){
+    if(cat === 'map'){
+      STATE.worldmap.center = val.center;
+      STATE.worldmap.markers = val.markers;
+      STATE.automap = val.automap;
+    } else {
+      STATE[cat] = val;
+    }
+  }
+  function getDefaultSlice(cat){
+    if(cat === 'map') return { center: DEFAULT_STATE.worldmap.center, markers: DEFAULT_STATE.worldmap.markers, automap: DEFAULT_STATE.automap };
+    return DEFAULT_STATE[cat];
+  }
+  function renderCategory(cat){
+    if(cat === 'stat') renderStat();
+    else if(cat === 'items'){ renderItemFilters(); renderItems(); renderDetail(); }
+    else if(cat === 'quests') renderQuests();
+    else if(cat === 'holos') renderHolos();
+    else if(cat === 'map'){
+      resizeAutomap();
+      if(window._leafletMap){ renderWorldMapMarkers(); recenterWorldMap(); }
+    }
+  }
+  function renderAllCategories(){
+    ['stat','items','quests','holos','map'].forEach(renderCategory);
+    setText('statusbar-loc', STATE.location);
+  }
+
+  var settingsScreen = document.getElementById('settings-screen');
+  var settingsEditor = document.getElementById('settings-editor');
+  var settingsMsg = document.getElementById('settings-msg');
+  var settingsTabbar = document.getElementById('settings-tabbar');
+  var currentSettingsCat = 'stat';
+
+  function loadEditorFor(cat){
+    settingsEditor.value = JSON.stringify(getStateSlice(cat), null, 2);
+    settingsMsg.textContent = '';
+    settingsMsg.className = 'settings-msg';
+  }
+
+  document.getElementById('settings-btn').addEventListener('click', function(){
+    settingsScreen.classList.add('open');
+    loadEditorFor(currentSettingsCat);
+  });
+  document.getElementById('settings-close').addEventListener('click', function(){
+    settingsScreen.classList.remove('open');
+  });
+  settingsTabbar.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      settingsTabbar.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+      currentSettingsCat = chip.dataset.cat;
+      loadEditorFor(currentSettingsCat);
+    });
+  });
+  document.getElementById('settings-save').addEventListener('click', function(){
+    try{
+      var parsed = JSON.parse(settingsEditor.value);
+      setStateSlice(currentSettingsCat, parsed);
+      renderCategory(currentSettingsCat);
+      persistState();
+      settingsMsg.textContent = 'SAVED.';
+      settingsMsg.className = 'settings-msg ok';
+    }catch(e){
+      settingsMsg.textContent = 'INVALID JSON — ' + e.message;
+      settingsMsg.className = 'settings-msg';
+    }
+  });
+  document.getElementById('settings-reset-cat').addEventListener('click', function(){
+    setStateSlice(currentSettingsCat, clone(getDefaultSlice(currentSettingsCat)));
+    renderCategory(currentSettingsCat);
+    loadEditorFor(currentSettingsCat);
+    persistState();
+    settingsMsg.textContent = 'THIS TAB RESET TO DEFAULT.';
+    settingsMsg.className = 'settings-msg ok';
+  });
+  document.getElementById('settings-reset-all').addEventListener('click', function(){
+    STATE = clone(DEFAULT_STATE);
+    renderAllCategories();
+    loadEditorFor(currentSettingsCat);
+    persistState();
+    settingsMsg.textContent = 'ALL DATA RESET TO DEFAULT.';
+    settingsMsg.className = 'settings-msg ok';
+  });
+
+  /* ================= PERSISTENCE ================= */
+  function persistState(){
+    var json = JSON.stringify(STATE);
+    if(window.storage && window.storage.set){
+      try{ window.storage.set('pipboy-custom-state', json, false).catch(function(){}); }catch(e){}
+    }
+    try{ localStorage.setItem('pipboy-custom-state', json); }catch(e){}
+    window.__pipboyMemoryState = STATE;
+  }
+  function loadPersistedState(){
+    var tryClaudeStorage = function(){
+      if(window.storage && window.storage.get){
+        return window.storage.get('pipboy-custom-state', false)
+          .then(function(res){ return (res && res.value) ? JSON.parse(res.value) : null; })
+          .catch(function(){ return null; });
+      }
+      return Promise.resolve(null);
+    };
+    return tryClaudeStorage().then(function(fromClaude){
+      if(fromClaude) return fromClaude;
+      try{
+        var raw = localStorage.getItem('pipboy-custom-state');
+        if(raw) return JSON.parse(raw);
+      }catch(e){}
+      if(window.__pipboyMemoryState) return window.__pipboyMemoryState;
+      return null;
+    });
+  }
+
+  /* ================= INITIAL RENDER ================= */
+  renderStat();
+  renderItemFilters();
+  renderItems();
+  renderQuests();
+  renderHolos();
+  setText('statusbar-loc', STATE.location);
+
+  loadPersistedState().then(function(saved){
+    if(saved && typeof saved === 'object'){
+      Object.keys(DEFAULT_STATE).forEach(function(k){
+        if(saved[k] !== undefined) STATE[k] = saved[k];
+      });
+      renderAllCategories();
+    }
+  }).catch(function(){});
 
   // initial automap draw once layout settles
   requestAnimationFrame(function(){ setTimeout(resizeAutomap, 50); });
