@@ -1115,30 +1115,31 @@
       rad: { text:'140 rads', pct:28 },
       poison: { text:'0', pct:0 },
       special: [
-        {abbr:'ST', name:'Strength', val:6},
-        {abbr:'PE', name:'Perception', val:7},
-        {abbr:'EN', name:'Endurance', val:5},
-        {abbr:'CH', name:'Charisma', val:4},
-        {abbr:'IN', name:'Intelligence', val:8},
-        {abbr:'AG', name:'Agility', val:7},
-        {abbr:'LK', name:'Luck', val:6}
+        {abbr:'ST', name:'Strength', val:10},
+        {abbr:'PE', name:'Perception', val:10},
+        {abbr:'EN', name:'Endurance', val:10},
+        {abbr:'CH', name:'Charisma', val:9},
+        {abbr:'IN', name:'Intelligence', val:10},
+        {abbr:'AG', name:'Agility', val:10},
+        {abbr:'LK', name:'Luck', val:10}
       ],
       derived: [
-        ['Armor Class','18'], ['Sequence','14'], ['Healing Rate','2'], ['Crit. Chance','12%'],
-        ['Melee Damage','4'], ['Carry Weight','175 lb'], ['Damage Res.','15%'], ['Poison Res.','20%']
+        ['Armor Class','35'], ['Sequence','31'], ['Healing Rate','16'], ['Crit. Chance','100%'],
+        ['Melee Damage','999'], ['Carry Weight','350 lb'], ['Damage Res.','90%'], ['Poison Res.','95%']
       ]
     },
     items: {
       maxWeight: 175,
       list: [
-        {name:'10mm Pistol', cat:'Weapon', wt:3, val:100, equipped:true, desc:'Standard sidearm. Reliable, low maintenance, chambered for 10mm rounds.'},
+        {name:'Chosen One\'s 10mm Pistol ', cat:'Weapon', wt:3, val:100, equipped:true, desc:'Standard sidearm. Reliable, low maintenance, chambered for 10mm rounds.'},
         {name:'Combat Knife', cat:'Weapon', wt:2, val:8, equipped:false, desc:'Serrated steel blade. Fast, quiet, and always ready.'},
-        {name:'Leather Armor', cat:'Apparel', wt:8, val:70, equipped:true, desc:'Boiled leather plating stitched over canvas. Modest protection, minimal encumbrance.'},
+        {name:'Vault 13 Jacket ', cat:'Apparel', wt:8, val:80, equipped:true, desc:'Second clothing found to be from your descendant the Vault Dweller. Modest protection, minimal encumbrance.'},
         {name:'Stimpak', cat:'Aid', wt:1, val:75, qty:4, desc:'Pressurized syringe of healing chemicals. Restores hit points instantly.'},
         {name:'RadAway', cat:'Aid', wt:1, val:90, qty:2, desc:'IV drip that purges radiation from the bloodstream over several minutes.'},
         {name:'Geiger Counter', cat:'Misc', wt:1, val:45, desc:'Clicks faster near irradiated material. Essential wasteland gear.'},
         {name:'Bottle Caps', cat:'Misc', wt:0, val:1, qty:238, desc:'Currency of the wastes.'},
-        {name:'Holotape: Vault 13', cat:'Misc', wt:0, val:0, desc:'An old recorded log. Might be worth listening to.'}
+        {name:'Holotape: Vault 13', cat:'Misc', wt:0, val:0, desc:'An old recorded log. Might be worth listening to.'},
+        {name:'Upgraded Spear ', cat:'Weapon ', wt:4, val:40, equipped:true, desc:'Old Spear used by the Chosen One in Oklahoma around 2257, was upgraded to be faster, more deadly, accurate, and looks intimidating to enemies.'}
       ]
     },
     quests: [
@@ -1166,7 +1167,8 @@
     holos: [
       {name:'Overseer\'s Log — Entry 14', text:'The chip failure was inevitable. We should have rotated stock decades ago. Sending our best out was the only option left.'},
       {name:'Trader\'s Note', text:'Left the caps with Vic. Tell him the deal for the water flask still stands if he makes it back from Klamath.'},
-      {name:'Unknown Frequency', text:'...signal degrades badly this far south, repeat, this is not a drill, the herd is moving toward...', sub:'Okie News Radio Frequency', type:'radio'}
+      {name:'Frequency ', text:'...Okey dokey. This is Willy Rogers and you\'ve listening to Okie News Radio...', sub:'Okie News Radio Frequency', type:'radio'},
+      {name:'Unknown Frequency', text:'... it\'s a weak signal this far out south but we can hear patriotic songs playing....', type:'radio', sub:'Enclave Radio '}
     ],
     automap: [
       {name:'Vault 13', x:0.5, y:0.82, known:true, player:true},
